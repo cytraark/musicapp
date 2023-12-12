@@ -1,56 +1,89 @@
 'use client'
 import { Table, Input, Button } from "rsuite"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+
+
 export default function Home() {
-  const [data, setData] = useState()
-  const [filterMusic,setFilterMusic] = useState()
+  const [data, setData] = useState([])
+  const [filterMusic,setFilterMusic] = useState([])
   const [searchState, setSearchState] = useState()
   const { Column, HeaderCell, Cell } = Table;
+
+  useEffect(() => { 
+    const getMusic = async () => { 
+      const res = await fetch('https://jsonplaceholder.typicode.com/users')
+        .then(res => { 
+          return res.json()
+        })
+        .then(data => { 
+          setData(data)
+        })
+    
+    }
+
+    getMusic()
+
+  },[])
   return (
     <>
-      <div className=" w-screen h-screen overflow-y-scroll overflow-x-hidden bg-white">
-        <div className=" z-10 flex flex-wrap gap-5 relative place-content-center w-screen mt-20 bg-white text-black">
-          <h1> Music App</h1>
-          <Input placeholder="Search Music"></Input>
-        </div>
-        <div className="flex flex-col">
-          <Table
-            height={400}
-            data={data}
-            onRowClick={rowData => {
-              console.log(rowData);
+      <div className=" w-screen h-screen flex flex-col gap-5 bg-gray-900">
+        <div className="flex flex-col place-content-center pt-10">
+          <div className="flex flex-row justify-start pl-10 pt-5 text-white">
+            <h2>Music App for Testing</h2>
+          </div>
+           <div className="flex flex-row justify-start gap-2 pt-10 pl-10 w-1/2">
+            {" "}
+            <Input
+              size="md"
+              placeholder="Search Music!"
+              onChange={setSearchState}
+              value={searchState}
+            />
+          </div>
+          <div className="flex flex-col place-content-center justify-center">
+            <Table
+               style={{
+                      display: "block",
+                      width: 950,
+                      height: 500,
+                      padding: 40,
+                      justifyContent: "center",
             }}
-          >
-            <Column width={60} align="center" fixed>
-              <HeaderCell>Song</HeaderCell>
-              <Cell dataKey="id" />
-            </Column>
+              data={data}
+              onRowClick={rowData => {
+                console.log(rowData);
+              }}
+            >
+              <Column width={60} align="center" fixed>
+                <HeaderCell>Id</HeaderCell>
+                <Cell dataKey="id" />
+              </Column>
 
-            <Column width={150}>
-              <HeaderCell>Artist</HeaderCell>
-              <Cell dataKey="firstName" />
-            </Column>
+              <Column width={150}>
+                <HeaderCell>First Name</HeaderCell>
+                <Cell dataKey="name" />
+              </Column>
 
-            <Column width={150}>
-              <HeaderCell>Year</HeaderCell>
-              <Cell dataKey="lastName" />
-            </Column>
+              <Column width={150}>
+                <HeaderCell>Last Name</HeaderCell>
+                <Cell dataKey="lastName" />
+              </Column>
+              <Column width={100} fixed="right">
+                <HeaderCell>...</HeaderCell>
 
-        
-            <Column width={80} fixed="right">
-              <HeaderCell>...</HeaderCell>
-
-              <Cell style={{ padding: '6px' }}>
-                {rowData => (
-                  <Button appearance="link" onClick={() => alert(`id:${rowData.id}`)}>
-                    Edit
-                  </Button>
-                )}
-              </Cell>
-            </Column>
-          </Table>
-        </div>
+                <Cell style={{ padding: '6px' }}>
+                  {rowData => (
+                    <Button appearance="ghost" onClick={() => alert(`id:${rowData.id}`)}>
+                      Play
+                    </Button>
+                  )}
+                </Cell>
+              </Column>
+            </Table>
+          </div>
+        </div> 
       </div>
+        
     </>
   )
 }
