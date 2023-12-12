@@ -1,27 +1,31 @@
 'use client'
 import { Table, Input, Button } from "rsuite"
 import { useState, useEffect } from "react"
-import GetMusic from "./api/music"
+import axios from "axios"
 
 export default function Home() {
   const [data, setData] = useState([])
   const [filterMusic,setFilterMusic] = useState([])
   const [searchState, setSearchState] = useState()
   const { Column, HeaderCell, Cell } = Table;
-  const { GetMusicSearch} = GetMusic()
 
   useEffect(() => { 
     const getMusic = async () => { 
-      const item = {
-        'X-RapidAPI-Key': process.env.NEXT_PUBLIC_BASE_API_KEY
-      }
-      let access = await GetMusicSearch(item)
-      console.log(access)
-      setData(access.data)
+      let array = []
+      const options = {
+        method: 'GET',
+        url: 'https://deezerdevs-deezer.p.rapidapi.com/search',
+        params: {q: 'eminem'},
+        headers: {
+          'X-RapidAPI-Key': 'f78ffe324fmshed767f7d95c68d1p1f5856jsneb2c7255ab35',
+          'X-RapidAPI-Host': 'deezerdevs-deezer.p.rapidapi.com'
+        }
+      };
+      let access = await axios.request(options)
+    
+      setData(access.data.data)
     }
-
     getMusic()
-
   },[])
   return (
     <>
@@ -54,30 +58,26 @@ export default function Home() {
                       height: 500,
                       padding: 40,
                       justifyContent: "center",
-            }}
+                  }}
+              virtualized
               data={data}
               onRowClick={rowData => {
                 console.log(rowData);
               }}
             >
-              <Column width={60} align="center" fixed>
-                <HeaderCell>Id</HeaderCell>
-                <Cell dataKey="id" />
+              <Column width={400}>
+                <HeaderCell>Song</HeaderCell>
+                <Cell dataKey="title" />
               </Column>
 
               <Column width={200}>
-                <HeaderCell>Song</HeaderCell>
-                <Cell dataKey="name" />
-              </Column>
-
-              <Column width={150}>
                 <HeaderCell>Artist</HeaderCell>
-                <Cell dataKey="lastName" />
+                <Cell dataKey="artist.name" />
               </Column>
 
               <Column width={150}>
-                <HeaderCell>Year</HeaderCell>
-                <Cell dataKey="lastName" />
+                <HeaderCell>Duration</HeaderCell>
+                <Cell dataKey="duration" />
               </Column>
 
               <Column width={100} fixed="right">
