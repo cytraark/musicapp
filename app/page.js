@@ -4,31 +4,14 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import PauseIcon from '@rsuite/icons/legacy/Pause';
 import PlayIcon from '@rsuite/icons/legacy/Play';
+import useSound from "use-sound";
 
 export default function Home() {
   const [data, setData] = useState([])
   const [searchState, setSearchState] = useState("")
-  const [play, setPlay] = useState(false)
-  const handlePlay = () => setPlay(true)
-  const handlePause = () => setPlay(false)
-  const mainButton = new Audio()
+  const [musicHandler,setMusicHandler]= useState("")
   const { Column, HeaderCell, Cell } = Table;
-  const getMusic =  async() => { 
-      const options = {
-        method: 'GET',
-        url: 'https://deezerdevs-deezer.p.rapidapi.com/search',
-        params: {q: searchState},
-        headers: {
-          'X-RapidAPI-Key': 'f78ffe324fmshed767f7d95c68d1p1f5856jsneb2c7255ab35',
-          'X-RapidAPI-Host': 'deezerdevs-deezer.p.rapidapi.com'
-        }
-      };
-      let access = await axios.request(options)
-      console.log(access.data.data)
-      setData(access.data.data)
-    }
-    getMusic()
-
+  var music = new Audio()
   useEffect(() => { 
     const getMusic = async () => { 
       const options = {
@@ -88,8 +71,10 @@ export default function Home() {
                     virtualized
                     data={data}
                     onRowClick={rowData => {
-                      {
-                        mainButton(rowData.preview)
+                      { 
+                        setMusicHandler(rowData.title)
+                        music.src = rowData.preview
+                        console.log(music, "Log")
                       }
                     }}
                 >
@@ -107,37 +92,25 @@ export default function Home() {
                 <HeaderCell>Duration</HeaderCell>
                 <Cell dataKey="duration" />
               </Column>
-
-              <Column width={100} fixed="right">
-                <HeaderCell>...</HeaderCell>
-
-                <Cell style={{ padding: '6px' }}>
-                  {rowData => (
-                        <Button appearance="ghost" onClick={() => { 
-                          var audio = new Audio(rowData.preview)
-                          if (play == true) {
-                            handlePause()
-                            audio.pause()
-                          } else { 
-                            handlePlay()
-                            audio.play()
-                          }
-                        }}>
-                          {play ? "Pause":"Play"}
-                    </Button>
-                  )}
-                </Cell>
-              </Column>
+              
             </Table>
                 </div>
               
             </>)}
           </div>
-          <div className="flex flex-row place-content-center gap-3 justify-center">
-              <IconButton icon={<PauseIcon />} placement="left">
+
+          <div className="flex flex-row place-content-center gap-3 pt-2">
+            <h6>Now Playing: {musicHandler}</h6>
+          </div>
+          <div className="flex flex-row place-content-center gap-3 pt-5 justify-center">
+            <IconButton icon={<PauseIcon />} placement="left" onClick={() => { 
+              music.pause()
+            }}>
                 Pause
               </IconButton>
-              <IconButton icon={<PlayIcon />} placement="right">
+            <IconButton icon={<PlayIcon />} placement="right" onClick={() => { 
+              music.play()
+            }} >
                 Play
               </IconButton>
           </div>
