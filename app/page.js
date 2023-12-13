@@ -11,24 +11,24 @@ export default function Home() {
   const [searchState, setSearchState] = useState("")
   const [musicHandler,setMusicHandler]= useState("")
   const { Column, HeaderCell, Cell } = Table;
-  const [music,setMusic] = useState(null)
-  useEffect(() => { 
-    setMusic(new Audio(URL))
-    const getMusic = async () => { 
+  const [music, setMusic] = useState(null)
+  const getMusic = async (searchState) => { 
       const options = {
         method: 'GET',
         url: 'https://deezerdevs-deezer.p.rapidapi.com/search',
-        params: {q: 'eminem'},
+        params: {q: searchState},
         headers: {
           'X-RapidAPI-Key': 'f78ffe324fmshed767f7d95c68d1p1f5856jsneb2c7255ab35',
           'X-RapidAPI-Host': 'deezerdevs-deezer.p.rapidapi.com'
         }
       };
       let access = await axios.request(options)
-      console.log(access.data.data)
       setData(access.data.data)
     }
-    getMusic()
+    
+  
+  useEffect(() => { 
+    setMusic(new Audio(URL))
   }, [])
   
   return (
@@ -41,15 +41,20 @@ export default function Home() {
           <div className="flex flex-col justify-center place-content-center gap-2 pt-10 pl-40 pr-40">
             <Input
               size="md"
-              placeholder="Search Music!"
-              onChange={() => { 
-                setSearchState
-              }}
+              placeholder="Search Music by Artist!"
+              onChange={setSearchState}
               value={searchState}
             />
-            <Button appearance="ghost" color="green" onClick={async() => { 
-              getMusic()
-            }}>Search</Button>
+            <Button appearance="ghost" color="green" onClick={
+              () => {
+                if (searchState === "" ) {
+                  return searchState
+                } else  { 
+                  getMusic(searchState)
+                }
+              }
+            }>Search
+            </Button>
           </div>
           <div className="flex flex-wrap place-content-center justify-center">
             {data === undefined || data === null ? (
@@ -94,11 +99,11 @@ export default function Home() {
               </Column>
                     
               <Column width={150}>
-                <HeaderCell>...</HeaderCell>
+                <HeaderCell>Status</HeaderCell>
                 <Cell>
                         {rowData => { 
                           if (rowData.preview === music.src) {
-                            return <p>Playing</p>
+                            return <p>Now Playing</p>
                           } else { 
                             return <p>Not Playing</p>
                           }
@@ -117,7 +122,7 @@ export default function Home() {
           <div className="flex flex-row place-content-center gap-3 pt-2">
             <h6>Now Playing: {musicHandler}</h6>
           </div>
-          <div className="flex flex-row place-content-center gap-3 pt-5 justify-center">
+            <div className="flex flex-row place-content-center gap-3 pt-5 justify-center">
             <IconButton icon={<PauseIcon />} placement="left" onClick={() => { 
               music.pause()
             }}>
