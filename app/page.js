@@ -4,15 +4,16 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import PauseIcon from '@rsuite/icons/legacy/Pause';
 import PlayIcon from '@rsuite/icons/legacy/Play';
-import useSound from "use-sound";
+
 
 export default function Home() {
   const [data, setData] = useState([])
   const [searchState, setSearchState] = useState("")
   const [musicHandler,setMusicHandler]= useState("")
   const { Column, HeaderCell, Cell } = Table;
-  var music = new Audio()
+  const [music,setMusic] = useState(null)
   useEffect(() => { 
+    setMusic(new Audio(URL))
     const getMusic = async () => { 
       const options = {
         method: 'GET',
@@ -74,23 +75,35 @@ export default function Home() {
                       { 
                         setMusicHandler(rowData.title)
                         music.src = rowData.preview
-                        console.log(music, "Log")
                       }
                     }}
                 >
-              <Column width={400}>
+              <Column width={350}>
                 <HeaderCell>Song</HeaderCell>
                 <Cell dataKey="title" />
               </Column>
 
-              <Column width={200}>
+              <Column width={130}>
                 <HeaderCell>Artist</HeaderCell>
                 <Cell dataKey="artist.name" />
               </Column>
 
+              <Column width={200}>
+                <HeaderCell>Short Title</HeaderCell>
+                <Cell dataKey="title_short" />
+              </Column>
+                    
               <Column width={150}>
-                <HeaderCell>Duration</HeaderCell>
-                <Cell dataKey="duration" />
+                <HeaderCell>...</HeaderCell>
+                <Cell>
+                        {rowData => { 
+                          if (rowData.preview === music.src) {
+                            return <p>Playing</p>
+                          } else { 
+                            return <p>Not Playing</p>
+                          }
+                        }}  
+                </Cell>
               </Column>
               
             </Table>
@@ -98,7 +111,9 @@ export default function Home() {
               
             </>)}
           </div>
-
+          {musicHandler === undefined || musicHandler === null || musicHandler === "" ? (<>
+            
+          </>) : (<>
           <div className="flex flex-row place-content-center gap-3 pt-2">
             <h6>Now Playing: {musicHandler}</h6>
           </div>
@@ -113,7 +128,8 @@ export default function Home() {
             }} >
                 Play
               </IconButton>
-          </div>
+          </div></>)}
+         
         </div> 
       </div>
         
